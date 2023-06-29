@@ -3,16 +3,33 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://ichigo-xin.github.io/</loc>
+    <lastmod>2023-06-28T21:00:04+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/p/neo4j-study/</loc>
+    <lastmod>2023-06-28T21:00:04+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/post/</loc>
+    <lastmod>2023-06-28T21:00:04+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/p/this-is-the-post-title/</loc>
     <lastmod>2023-06-28T14:56:38+08:00</lastmod>
   </url><url>
-    <loc>https://ichigo-xin.github.io/posts/</loc>
-    <lastmod>2023-06-28T14:56:38+08:00</lastmod>
+    <loc>https://ichigo-xin.github.io/archives/</loc>
+    <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://ichigo-xin.github.io/posts/mypost/</loc>
-    <lastmod>2023-06-28T14:56:38+08:00</lastmod>
+    <loc>https://ichigo-xin.github.io/page/</loc>
+    <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://ichigo-xin.github.io/categories/</loc>
   </url><url>
+    <loc>https://ichigo-xin.github.io/links/</loc>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/search/</loc>
+  </url><url>
     <loc>https://ichigo-xin.github.io/tags/</loc>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/categories/test/</loc>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/%E5%85%B3%E4%BA%8E/</loc>
   </url>
 </urlset>
