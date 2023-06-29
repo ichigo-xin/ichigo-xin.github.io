@@ -1,21 +1,4 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<<<<<<< HEAD
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  
-  <sitemap>
-    <loc>https://ichigo-xin.github.io/zh-cn/sitemap.xml</loc>
-    
-      <lastmod>2023-06-28T21:00:04+08:00</lastmod>
-    
-  </sitemap>
-  
-  <sitemap>
-    <loc>https://ichigo-xin.github.io/ar/sitemap.xml</loc>
-    
-  </sitemap>
-  
-</sitemapindex>
-=======
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
@@ -50,4 +33,3 @@
     <loc>https://ichigo-xin.github.io/%E5%85%B3%E4%BA%8E/</loc>
   </url>
 </urlset>
->>>>>>> e1476ade659b07dbbd153ea3c199a49aef988b8b
