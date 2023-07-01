@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='在本篇文章中，我会对Neo4j图数据库、查询语句Cypher进行介绍，这样可以让你更容易掌握这门技术。其中主要包括Neo4j的安装配置，查询语句Cypher使用。
+本文是全系列中的第1/4篇
+Neo4j和知识图谱：Neo4j安装和使用
+Neo4j和知识图谱：Neo4j内置算法库的安装和使用
+Neo4j和知识图谱：使用Neo4j构建知识图谱
+Neo4j和知识图谱：项目中使用py2neo的ogm框架构建知识图谱
+Neo4j介绍 Neo4j是一种广泛使用的图形数据库管理系统，专注于存储和处理具有复杂关系的数据。它使用图形模型来表示数据，其中节点表示实体，边表示实体之间的关系。Neo4j提供了一种高效灵活的方式来处理和查询这些图形数据。
+Neo4j的使用场景非常丰富，适用于多个领域和行业。以下是一些常见的使用场景：
+社交网络分析：Neo4j可以存储和分析社交网络中的用户关系、兴趣和活动。它能够高效地执行复杂的关系查询，例如查找朋友的朋友、查找共同兴趣的人等。 推荐系统：Neo4j可以帮助构建个性化的推荐系统。通过建模用户、产品和其它相关属性之间的关系，Neo4j能够快速查询和发现潜在的兴趣和推荐。 知识图谱和语义网络：Neo4j能够存储和查询知识图谱，这是一种表示实体之间关系和属性的结构化数据模型。知识图谱广泛应用于搜索引擎、智能助手和推荐系统等领域。 这些场景用关系型数据库实现非常困难，这就是图数据库发挥作用的地方。
+Neo4j安装 Neo4j有社区版和企业版。这里我们选择社区版，同时Neo4j使用Java进行开发的，因此和JDK版本有着对应关系，4.x的版本选择jdk11，因为后续会安装算法库，再加上项目开发的需求就选择了neo4j-community-4.4.22-unix的版本。
+Neo4j version Neo4j Graph Data Science 5.9 2.4, 2.3.9 or later 5.8 2.4, 2.3.6 or later 5.7 2.4, 2.3.3 or later 5.6 2.4, 2.3.2 or later 5.5 2.4, 2.3.1 or later 5.4 2.4, 2.3 5.3 2.4, 2.3 5.2 2.4, 2.3 5.1 2.4, 2.3 4.4.9 or later 2.4, 2.3 具体版本要求官网地址
+下载地址
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 安装步骤 安装前需要安装jdk11 1.'>
+<title>Neo4j和知识图谱：Neo4j安装和使用</title>
+
+<link rel='canonical' href='https://ichigo-xin.github.io/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='Neo4j和知识图谱：Neo4j安装和使用'>
+<meta property='og:description' content='在本篇文章中，我会对Neo4j图数据库、查询语句Cypher进行介绍，这样可以让你更容易掌握这门技术。其中主要包括Neo4j的安装配置，查询语句Cypher使用。
+本文是全系列中的第1/4篇
+Neo4j和知识图谱：Neo4j安装和使用
+Neo4j和知识图谱：Neo4j内置算法库的安装和使用
+Neo4j和知识图谱：使用Neo4j构建知识图谱
+Neo4j和知识图谱：项目中使用py2neo的ogm框架构建知识图谱
+Neo4j介绍 Neo4j是一种广泛使用的图形数据库管理系统，专注于存储和处理具有复杂关系的数据。它使用图形模型来表示数据，其中节点表示实体，边表示实体之间的关系。Neo4j提供了一种高效灵活的方式来处理和查询这些图形数据。
+Neo4j的使用场景非常丰富，适用于多个领域和行业。以下是一些常见的使用场景：
+社交网络分析：Neo4j可以存储和分析社交网络中的用户关系、兴趣和活动。它能够高效地执行复杂的关系查询，例如查找朋友的朋友、查找共同兴趣的人等。 推荐系统：Neo4j可以帮助构建个性化的推荐系统。通过建模用户、产品和其它相关属性之间的关系，Neo4j能够快速查询和发现潜在的兴趣和推荐。 知识图谱和语义网络：Neo4j能够存储和查询知识图谱，这是一种表示实体之间关系和属性的结构化数据模型。知识图谱广泛应用于搜索引擎、智能助手和推荐系统等领域。 这些场景用关系型数据库实现非常困难，这就是图数据库发挥作用的地方。
+Neo4j安装 Neo4j有社区版和企业版。这里我们选择社区版，同时Neo4j使用Java进行开发的，因此和JDK版本有着对应关系，4.x的版本选择jdk11，因为后续会安装算法库，再加上项目开发的需求就选择了neo4j-community-4.4.22-unix的版本。
+Neo4j version Neo4j Graph Data Science 5.9 2.4, 2.3.9 or later 5.8 2.4, 2.3.6 or later 5.7 2.4, 2.3.3 or later 5.6 2.4, 2.3.2 or later 5.5 2.4, 2.3.1 or later 5.4 2.4, 2.3 5.3 2.4, 2.3 5.2 2.4, 2.3 5.1 2.4, 2.3 4.4.9 or later 2.4, 2.3 具体版本要求官网地址
+下载地址
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 安装步骤 安装前需要安装jdk11 1.'>
+<meta property='og:url' content='https://ichigo-xin.github.io/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/'>
+<meta property='og:site_name' content='ichigo-xin的博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2023-06-28T21:00:04&#43;08:00'/><meta property='article:modified_time' content='2023-06-28T21:00:04&#43;08:00'/>
+<meta name="twitter:title" content="Neo4j和知识图谱：Neo4j安装和使用">
+<meta name="twitter:description" content="在本篇文章中，我会对Neo4j图数据库、查询语句Cypher进行介绍，这样可以让你更容易掌握这门技术。其中主要包括Neo4j的安装配置，查询语句Cypher使用。
+本文是全系列中的第1/4篇
+Neo4j和知识图谱：Neo4j安装和使用
+Neo4j和知识图谱：Neo4j内置算法库的安装和使用
+Neo4j和知识图谱：使用Neo4j构建知识图谱
+Neo4j和知识图谱：项目中使用py2neo的ogm框架构建知识图谱
+Neo4j介绍 Neo4j是一种广泛使用的图形数据库管理系统，专注于存储和处理具有复杂关系的数据。它使用图形模型来表示数据，其中节点表示实体，边表示实体之间的关系。Neo4j提供了一种高效灵活的方式来处理和查询这些图形数据。
+Neo4j的使用场景非常丰富，适用于多个领域和行业。以下是一些常见的使用场景：
+社交网络分析：Neo4j可以存储和分析社交网络中的用户关系、兴趣和活动。它能够高效地执行复杂的关系查询，例如查找朋友的朋友、查找共同兴趣的人等。 推荐系统：Neo4j可以帮助构建个性化的推荐系统。通过建模用户、产品和其它相关属性之间的关系，Neo4j能够快速查询和发现潜在的兴趣和推荐。 知识图谱和语义网络：Neo4j能够存储和查询知识图谱，这是一种表示实体之间关系和属性的结构化数据模型。知识图谱广泛应用于搜索引擎、智能助手和推荐系统等领域。 这些场景用关系型数据库实现非常困难，这就是图数据库发挥作用的地方。
+Neo4j安装 Neo4j有社区版和企业版。这里我们选择社区版，同时Neo4j使用Java进行开发的，因此和JDK版本有着对应关系，4.x的版本选择jdk11，因为后续会安装算法库，再加上项目开发的需求就选择了neo4j-community-4.4.22-unix的版本。
+Neo4j version Neo4j Graph Data Science 5.9 2.4, 2.3.9 or later 5.8 2.4, 2.3.6 or later 5.7 2.4, 2.3.3 or later 5.6 2.4, 2.3.2 or later 5.5 2.4, 2.3.1 or later 5.4 2.4, 2.3 5.3 2.4, 2.3 5.2 2.4, 2.3 5.1 2.4, 2.3 4.4.9 or later 2.4, 2.3 具体版本要求官网地址
+下载地址
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 安装步骤 安装前需要安装jdk11 1.">
+    <link rel="shortcut icon" href="/ichigo.jpg" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ichigo_huc5828797f4458237968d886b43fe8dd1_45236_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">ichigo-xin的博客</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="social-menu">
+            
+                <li>
+                    <a 
+                        href='https://github.com/ichigo-xin'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>暗色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#neo4j介绍">Neo4j介绍</a></li>
+    <li><a href="#neo4j安装">Neo4j安装</a></li>
+    <li><a href="#cypher的使用">Cypher的使用</a>
+      <ol>
+        <li><a href="#创建节点">创建节点</a></li>
+        <li><a href="#创建关系">创建关系</a></li>
+        <li><a href="#删除节点">删除节点</a></li>
+        <li><a href="#删除关系">删除关系</a></li>
+        <li><a href="#修改属性值">修改属性值</a></li>
+        <li><a href="#查询">查询</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/">Neo4j和知识图谱：Neo4j安装和使用</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 28, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>在本篇文章中，我会对Neo4j图数据库、查询语句Cypher进行介绍，这样可以让你更容易掌握这门技术。其中主要包括Neo4j的安装配置，查询语句Cypher使用。</p>
+<p>本文是全系列中的第1/4篇</p>
+<ul>
+<li>
+<p>Neo4j和知识图谱：Neo4j安装和使用</p>
+</li>
+<li>
+<p>Neo4j和知识图谱：Neo4j内置算法库的安装和使用</p>
+</li>
+<li>
+<p>Neo4j和知识图谱：使用Neo4j构建知识图谱</p>
+</li>
+<li>
+<p>Neo4j和知识图谱：项目中使用py2neo的ogm框架构建知识图谱</p>
+</li>
+</ul>
+<h2 id="neo4j介绍">Neo4j介绍</h2>
+<p>Neo4j是一种广泛使用的图形数据库管理系统，专注于存储和处理具有复杂关系的数据。它使用图形模型来表示数据，其中节点表示实体，边表示实体之间的关系。Neo4j提供了一种高效灵活的方式来处理和查询这些图形数据。</p>
+<p>Neo4j的使用场景非常丰富，适用于多个领域和行业。以下是一些常见的使用场景：</p>
+<ol>
+<li>社交网络分析：Neo4j可以存储和分析社交网络中的用户关系、兴趣和活动。它能够高效地执行复杂的关系查询，例如查找朋友的朋友、查找共同兴趣的人等。</li>
+<li>推荐系统：Neo4j可以帮助构建个性化的推荐系统。通过建模用户、产品和其它相关属性之间的关系，Neo4j能够快速查询和发现潜在的兴趣和推荐。</li>
+<li>知识图谱和语义网络：Neo4j能够存储和查询知识图谱，这是一种表示实体之间关系和属性的结构化数据模型。知识图谱广泛应用于搜索引擎、智能助手和推荐系统等领域。</li>
+</ol>
+<p>这些场景用关系型数据库实现非常困难，这就是图数据库发挥作用的地方。</p>
+<h2 id="neo4j安装">Neo4j安装</h2>
+<p>Neo4j有社区版和企业版。这里我们选择社区版，同时Neo4j使用Java进行开发的，因此和JDK版本有着对应关系，4.x的版本选择jdk11，因为后续会安装算法库，再加上项目开发的需求就选择了neo4j-community-4.4.22-unix的版本。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Neo4j version</th>
+<th>Neo4j Graph Data Science</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>5.9</code></td>
+<td><code>2.4</code>, <code>2.3.9</code> or later</td>
+</tr>
+<tr>
+<td><code>5.8</code></td>
+<td><code>2.4</code>, <code>2.3.6</code> or later</td>
+</tr>
+<tr>
+<td><code>5.7</code></td>
+<td><code>2.4</code>, <code>2.3.3</code> or later</td>
+</tr>
+<tr>
+<td><code>5.6</code></td>
+<td><code>2.4</code>, <code>2.3.2</code> or later</td>
+</tr>
+<tr>
+<td><code>5.5</code></td>
+<td><code>2.4</code>, <code>2.3.1</code> or later</td>
+</tr>
+<tr>
+<td><code>5.4</code></td>
+<td><code>2.4</code>, <code>2.3</code></td>
+</tr>
+<tr>
+<td><code>5.3</code></td>
+<td><code>2.4</code>, <code>2.3</code></td>
+</tr>
+<tr>
+<td><code>5.2</code></td>
+<td><code>2.4</code>, <code>2.3</code></td>
+</tr>
+<tr>
+<td><code>5.1</code></td>
+<td><code>2.4</code>, <code>2.3</code></td>
+</tr>
+<tr>
+<td><code>4.4.9</code> or later</td>
+<td><code>2.4</code>, <code>2.3</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><a class="link" href="https://neo4j.com/docs/graph-data-science/current/installation/supported-neo4j-versions/"  target="_blank" rel="noopener"
+    >具体版本要求官网地址</a></p>
+<p><a class="link" href="https://neo4j.com/download-center/#community"  target="_blank" rel="noopener"
+    >下载地址</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">安装步骤
+</span></span><span class="line"><span class="cl">安装前需要安装jdk11
+</span></span><span class="line"><span class="cl">1.解压安装包
+</span></span><span class="line"><span class="cl">tar -xf neo4j-community-4.4.22-unix.tar.gz
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">2.配置neo4j
+</span></span><span class="line"><span class="cl">cd neo4j-community-4.4.22/
+</span></span><span class="line"><span class="cl">vim conf/neo4j.conf
+</span></span><span class="line"><span class="cl">dbms.memory.heap.initial_size=4g #根据服务器的内存进行修改
+</span></span><span class="line"><span class="cl">dbms.memory.heap.max_size=4g  #根据服务器的内存进行修改
+</span></span><span class="line"><span class="cl">dbms.default_listen_address=0.0.0.0 #设置可以远程访问
+</span></span><span class="line"><span class="cl">dbms.connector.http.listen_address=:7474
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">3.启动
+</span></span><span class="line"><span class="cl">bin/neo4j start
+</span></span><span class="line"><span class="cl">看下服务有没有启动 ps -ef | grep neo
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">4.打开浏览器，并访问 http://ip:7474/ ，这将打开Neo4j的Web控制台
+</span></span><span class="line"><span class="cl">用户名和密码 neo4j/neo4j
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/imgs/neo4j%e2%80%94web%e6%8e%a7%e5%88%b6%e5%8f%b0.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="neo4j web控制台"
+	
+	
+></p>
+<h2 id="cypher的使用">Cypher的使用</h2>
+<p>用cypher查询neo4j就相当于用sql查询mysql</p>
+<h3 id="创建节点">创建节点</h3>
+<p>创建单个节点</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">create (n:Person {name:&#34;孙悟空&#34;})
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>创建多个节点</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">CREATE (n:Person {name: &#34;唐三藏&#34;}), (m:Person {name: &#34;猪八戒&#34;, weapon: &#34;九齿钉耙&#34;})
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果没有定义model的话，对于一个节点是可以随意配置属性的，上面的猪八戒中就多了个武器的属性</p>
+<h3 id="创建关系">创建关系</h3>
+<p>语法:  ()代表实体，-[]-&gt;代表关系</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">create ()-[]-&gt;()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>创建已有节点的关系</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">MATCH (n:Person )
+</span></span><span class="line"><span class="cl">match (n:Person{name:&#34;孙悟空&#34;}), (m:Person{name:&#34;猪八戒&#34;})
+</span></span><span class="line"><span class="cl">create (n)-[r:shidi{name:&#34;师弟&#34;}]-&gt;(m)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/imgs/neo4j-rel.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>创建节点和关系</p>
+<p><img src="/imgs/neo4j-rel2.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h3 id="删除节点">删除节点</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">match (n:Person {name:&#39;唐三藏&#39;})
+</span></span><span class="line"><span class="cl">delete n
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="删除关系">删除关系</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">match (n:Person {name:&#34;李靖&#34;})-[r:child]-&gt;(m:Person {name:&#39;哪吒&#39;})
+</span></span><span class="line"><span class="cl">delete r
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="修改属性值">修改属性值</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">match (n:Person {name:&#34;孙悟空&#34;})
+</span></span><span class="line"><span class="cl">set n.weapon = &#34;如意金箍棒&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="查询">查询</h3>
+<p>就是match，然后接个return</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">match (n:Person {name:&#34;孙悟空&#34;}) return n
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">使用where进行过滤
+</span></span><span class="line"><span class="cl">match (n:Person )  where n.name = &#34;猪八戒&#34; return n
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">使用limit进行限制
+</span></span><span class="line"><span class="cl">match (n:Person )  return n limit 2
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="ichigo-xin/blog"
+    data-repo-id="R_kgDOJ1CHuA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOJ1CHuM4CXjhh"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2023 ichigo-xin的博客
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
