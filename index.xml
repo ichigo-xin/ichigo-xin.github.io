@@ -79,7 +79,8 @@
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;@python.exe  E:\PythonScript\check_personnal_info.py %*
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://ichigo-xin.github.io/imgs/check_test.png&#34;
+&lt;/div&gt;&lt;p&gt;在对应博客目录执行 check + 文件名 即可，如 check check.md
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/check_test.png&#34;
 	
 	
 	
