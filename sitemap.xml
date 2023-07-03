@@ -2,11 +2,29 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://ichigo-xin.github.io/categories/code/</loc>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
+  </url><url>
     <loc>https://ichigo-xin.github.io/</loc>
-    <lastmod>2023-07-01T14:38:30+08:00</lastmod>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/tags/kg/</loc>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/tags/neo4j/</loc>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%86%85%E7%BD%AE%E7%AE%97%E6%B3%95%E5%BA%93%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/</loc>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
   </url><url>
     <loc>https://ichigo-xin.github.io/post/</loc>
-    <lastmod>2023-07-01T14:38:30+08:00</lastmod>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/tags/</loc>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
+  </url><url>
+    <loc>https://ichigo-xin.github.io/categories/</loc>
+    <lastmod>2023-07-03T20:52:02+08:00</lastmod>
   </url><url>
     <loc>https://ichigo-xin.github.io/tags/tool/</loc>
     <lastmod>2023-07-01T14:38:30+08:00</lastmod>
@@ -14,23 +32,8 @@
     <loc>https://ichigo-xin.github.io/categories/tool/</loc>
     <lastmod>2023-07-01T14:38:30+08:00</lastmod>
   </url><url>
-    <loc>https://ichigo-xin.github.io/tags/</loc>
-    <lastmod>2023-07-01T14:38:30+08:00</lastmod>
-  </url><url>
-    <loc>https://ichigo-xin.github.io/categories/</loc>
-    <lastmod>2023-07-01T14:38:30+08:00</lastmod>
-  </url><url>
     <loc>https://ichigo-xin.github.io/p/%E6%A3%80%E6%B5%8B%E5%8D%9A%E5%AE%A2%E4%B8%AD%E7%9A%84%E4%B8%AA%E4%BA%BA%E4%BF%A1%E6%81%AF%E8%84%9A%E6%9C%AC%E5%92%8C%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</loc>
     <lastmod>2023-07-01T14:38:30+08:00</lastmod>
-  </url><url>
-    <loc>https://ichigo-xin.github.io/categories/code/</loc>
-    <lastmod>2023-06-28T21:00:04+08:00</lastmod>
-  </url><url>
-    <loc>https://ichigo-xin.github.io/tags/kg/</loc>
-    <lastmod>2023-06-28T21:00:04+08:00</lastmod>
-  </url><url>
-    <loc>https://ichigo-xin.github.io/tags/neo4j/</loc>
-    <lastmod>2023-06-28T21:00:04+08:00</lastmod>
   </url><url>
     <loc>https://ichigo-xin.github.io/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/</loc>
     <lastmod>2023-06-28T21:00:04+08:00</lastmod>
