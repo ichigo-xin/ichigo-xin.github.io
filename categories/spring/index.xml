@@ -7,11 +7,11 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <lastBuildDate>Wed, 26 Jul 2023 21:56:50 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/categories/spring/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>手写Spring整合Jpa流程和Spring Data JPA源码解析</title>
-        <link>https://ichigo-xin.github.io/p/%E6%89%8B%E5%86%99spring%E6%95%B4%E5%90%88jpa%E6%B5%81%E7%A8%8B%E5%92%8Cspring-data-jpa%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
+        <title>手写Spring整合Jpa流程</title>
+        <link>https://ichigo-xin.github.io/p/%E6%89%8B%E5%86%99spring%E6%95%B4%E5%90%88jpa%E6%B5%81%E7%A8%8B/</link>
         <pubDate>Wed, 26 Jul 2023 21:56:50 +0800</pubDate>
         
-        <guid>https://ichigo-xin.github.io/p/%E6%89%8B%E5%86%99spring%E6%95%B4%E5%90%88jpa%E6%B5%81%E7%A8%8B%E5%92%8Cspring-data-jpa%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</guid>
+        <guid>https://ichigo-xin.github.io/p/%E6%89%8B%E5%86%99spring%E6%95%B4%E5%90%88jpa%E6%B5%81%E7%A8%8B/</guid>
         <description>&lt;p&gt;在本篇文章中，我将手写模拟Spring整合Jpa流程。&lt;/p&gt;
 &lt;h2 id=&#34;项目搭建&#34;&gt;项目搭建&lt;/h2&gt;
 &lt;p&gt;项目依赖:&lt;/p&gt;
