@@ -6,7 +6,6 @@
         <description>Recent content in 分类 on ichigo-xin的博客</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-<<<<<<< HEAD
         <lastBuildDate>Wed, 16 Aug 2023 23:35:48 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/categories/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>ARTS</title>
         <link>https://ichigo-xin.github.io/categories/arts/</link>
@@ -20,13 +19,6 @@
         <link>https://ichigo-xin.github.io/categories/code/</link>
         <pubDate>Wed, 26 Jul 2023 21:56:50 +0800</pubDate>
         
-=======
-        <lastBuildDate>Wed, 26 Jul 2023 21:56:50 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/categories/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>code</title>
-        <link>https://ichigo-xin.github.io/categories/code/</link>
-        <pubDate>Wed, 26 Jul 2023 21:56:50 +0800</pubDate>
-        
->>>>>>> 82e69a0b0ade0e55d861d38ff4a9715927d2cfa8
         <guid>https://ichigo-xin.github.io/categories/code/</guid>
         <description>&lt;img src="https://ichigo-xin.github.io/categories/code/DM_20230701155412_001.jpg" alt="Featured image of post code" /&gt;</description>
         </item>
