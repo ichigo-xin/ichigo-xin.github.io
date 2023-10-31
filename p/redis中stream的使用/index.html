@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='看了官方文档的stream介绍和网上的博客，总结redis中stream的用法。官网链接
+介绍 redis在5.0之后的版本里多出了一个新的数据结构stream，在系统已经使用了redis，并且并发量不是很大的情况下，就可以使用stream作为消息队列使用，不用去专门引入新的消息中间件。
+基本概念如下：
+消费组：每个消费组都是独立的，同一个消费组里面可以有多个消费者，这些消费者都是竞争关系，一个消息被消费者A消费了，消费游标last_delivered_id都会后移一个位置。
+消费者：消费者有自己的唯一id，同时内部维护了一个pending队列，消费后的消息都会在其中保存id，只有当ack之后才会从pending中移除。这个队列就可以用来解决，如果客户端挂了，下次重启服务的时候仍然可以处理这条消息。
+消息队列：也就是stream，和其他数据结构不一样，当list为空时，redis会自动删除这个list，stream可以为空然后保留下来，是因为消息队列里面有消费组和消费者的信息。
+消息：每个消息都有一个id，也就是时间戳，例如1698731874660-0，前面是时间戳，后面0表示在这个毫秒内的第几个。这样记录id就可以实现范围查找。
+基本命令 xadd 追加消息 xdel 删除消息。删除标志位 xrange 获取制定的消息 xlen 消息长度
+1 2 3 4 5 6 XADD race:italy * rider Castilla XADD race:france * rider Castilla speed 30.2 position 1 location_id 1 race:italy stream名称 * id，可以自己设置，一般都用这个，让redis自动生成 rider Castilla 消息内容，为一个一个的k-v 1 2 3 4 5 6 7 xrange race:italy - &#43; - 代表最小 &#43; 代表最大 也可以使用具体的id号，获取单条消息，可以start和end使用同一个id 比如：xrange race:italy 1698732650059-0 1698732650059-0 这些id其实就是时间，我们也可以制定不存在的时间比如1698732650060-0，把后面的59改成60 xrange race:italy 1698732650060-0 &#43; 1 2 xlen race:italy xdel 1698732650059-0 ，这个命令跟上消息id就可以了 单消费者 可以不使用消费组，就使用单个消费者来进行消费，命令是xread xread count 10 streams race:italy 0-0 从头开始消费，消费10个 还可以制定阻塞的方式来消费 xread block 0 streams race:italy $ 从最新的消息开始消费，block后面接上阻塞时间，0代表一直阻塞，我们在另一个客户端添加上信息，这边就可以消费到了。'>
+<title>redis中stream的使用</title>
+
+<link rel='canonical' href='https://ichigo-xin.github.io/p/redis%E4%B8%ADstream%E7%9A%84%E4%BD%BF%E7%94%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='redis中stream的使用'>
+<meta property='og:description' content='看了官方文档的stream介绍和网上的博客，总结redis中stream的用法。官网链接
+介绍 redis在5.0之后的版本里多出了一个新的数据结构stream，在系统已经使用了redis，并且并发量不是很大的情况下，就可以使用stream作为消息队列使用，不用去专门引入新的消息中间件。
+基本概念如下：
+消费组：每个消费组都是独立的，同一个消费组里面可以有多个消费者，这些消费者都是竞争关系，一个消息被消费者A消费了，消费游标last_delivered_id都会后移一个位置。
+消费者：消费者有自己的唯一id，同时内部维护了一个pending队列，消费后的消息都会在其中保存id，只有当ack之后才会从pending中移除。这个队列就可以用来解决，如果客户端挂了，下次重启服务的时候仍然可以处理这条消息。
+消息队列：也就是stream，和其他数据结构不一样，当list为空时，redis会自动删除这个list，stream可以为空然后保留下来，是因为消息队列里面有消费组和消费者的信息。
+消息：每个消息都有一个id，也就是时间戳，例如1698731874660-0，前面是时间戳，后面0表示在这个毫秒内的第几个。这样记录id就可以实现范围查找。
+基本命令 xadd 追加消息 xdel 删除消息。删除标志位 xrange 获取制定的消息 xlen 消息长度
+1 2 3 4 5 6 XADD race:italy * rider Castilla XADD race:france * rider Castilla speed 30.2 position 1 location_id 1 race:italy stream名称 * id，可以自己设置，一般都用这个，让redis自动生成 rider Castilla 消息内容，为一个一个的k-v 1 2 3 4 5 6 7 xrange race:italy - &#43; - 代表最小 &#43; 代表最大 也可以使用具体的id号，获取单条消息，可以start和end使用同一个id 比如：xrange race:italy 1698732650059-0 1698732650059-0 这些id其实就是时间，我们也可以制定不存在的时间比如1698732650060-0，把后面的59改成60 xrange race:italy 1698732650060-0 &#43; 1 2 xlen race:italy xdel 1698732650059-0 ，这个命令跟上消息id就可以了 单消费者 可以不使用消费组，就使用单个消费者来进行消费，命令是xread xread count 10 streams race:italy 0-0 从头开始消费，消费10个 还可以制定阻塞的方式来消费 xread block 0 streams race:italy $ 从最新的消息开始消费，block后面接上阻塞时间，0代表一直阻塞，我们在另一个客户端添加上信息，这边就可以消费到了。'>
+<meta property='og:url' content='https://ichigo-xin.github.io/p/redis%E4%B8%ADstream%E7%9A%84%E4%BD%BF%E7%94%A8/'>
+<meta property='og:site_name' content='ichigo-xin的博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='redis' /><meta property='article:tag' content='消息队列' /><meta property='article:published_time' content='2023-10-31T21:00:04&#43;08:00'/><meta property='article:modified_time' content='2023-10-31T21:00:04&#43;08:00'/>
+<meta name="twitter:title" content="redis中stream的使用">
+<meta name="twitter:description" content="看了官方文档的stream介绍和网上的博客，总结redis中stream的用法。官网链接
+介绍 redis在5.0之后的版本里多出了一个新的数据结构stream，在系统已经使用了redis，并且并发量不是很大的情况下，就可以使用stream作为消息队列使用，不用去专门引入新的消息中间件。
+基本概念如下：
+消费组：每个消费组都是独立的，同一个消费组里面可以有多个消费者，这些消费者都是竞争关系，一个消息被消费者A消费了，消费游标last_delivered_id都会后移一个位置。
+消费者：消费者有自己的唯一id，同时内部维护了一个pending队列，消费后的消息都会在其中保存id，只有当ack之后才会从pending中移除。这个队列就可以用来解决，如果客户端挂了，下次重启服务的时候仍然可以处理这条消息。
+消息队列：也就是stream，和其他数据结构不一样，当list为空时，redis会自动删除这个list，stream可以为空然后保留下来，是因为消息队列里面有消费组和消费者的信息。
+消息：每个消息都有一个id，也就是时间戳，例如1698731874660-0，前面是时间戳，后面0表示在这个毫秒内的第几个。这样记录id就可以实现范围查找。
+基本命令 xadd 追加消息 xdel 删除消息。删除标志位 xrange 获取制定的消息 xlen 消息长度
+1 2 3 4 5 6 XADD race:italy * rider Castilla XADD race:france * rider Castilla speed 30.2 position 1 location_id 1 race:italy stream名称 * id，可以自己设置，一般都用这个，让redis自动生成 rider Castilla 消息内容，为一个一个的k-v 1 2 3 4 5 6 7 xrange race:italy - &#43; - 代表最小 &#43; 代表最大 也可以使用具体的id号，获取单条消息，可以start和end使用同一个id 比如：xrange race:italy 1698732650059-0 1698732650059-0 这些id其实就是时间，我们也可以制定不存在的时间比如1698732650060-0，把后面的59改成60 xrange race:italy 1698732650060-0 &#43; 1 2 xlen race:italy xdel 1698732650059-0 ，这个命令跟上消息id就可以了 单消费者 可以不使用消费组，就使用单个消费者来进行消费，命令是xread xread count 10 streams race:italy 0-0 从头开始消费，消费10个 还可以制定阻塞的方式来消费 xread block 0 streams race:italy $ 从最新的消息开始消费，block后面接上阻塞时间，0代表一直阻塞，我们在另一个客户端添加上信息，这边就可以消费到了。">
+    <link rel="shortcut icon" href="/ichigo.jpg" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ichigo_huc5828797f4458237968d886b43fe8dd1_45236_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">ichigo-xin的博客</a></h1>
+            <h2 class="site-description">爱我所爱</h2>
+        </div>
+    </header><ol class="social-menu">
+            
+                <li>
+                    <a 
+                        href='https://github.com/ichigo-xin'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>暗色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#介绍">介绍</a></li>
+    <li><a href="#基本命令">基本命令</a></li>
+    <li><a href="#单消费者">单消费者</a></li>
+    <li><a href="#消费组">消费组</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/code/" >
+                code
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/redis%E4%B8%ADstream%E7%9A%84%E4%BD%BF%E7%94%A8/">redis中stream的使用</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 31, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>看了官方文档的stream介绍和网上的博客，总结redis中stream的用法。<a class="link" href="https://redis.io/docs/data-types/streams/"  target="_blank" rel="noopener"
+    >官网链接</a></p>
+<h2 id="介绍">介绍</h2>
+<p>redis在5.0之后的版本里多出了一个新的数据结构stream，在系统已经使用了redis，并且并发量不是很大的情况下，就可以使用stream作为消息队列使用，不用去专门引入新的消息中间件。</p>
+<p>基本概念如下：</p>
+<p><strong>消费组</strong>：每个消费组都是独立的，同一个消费组里面可以有多个消费者，这些消费者都是竞争关系，一个消息被消费者A消费了，消费游标last_delivered_id都会后移一个位置。</p>
+<p><strong>消费者</strong>：消费者有自己的唯一id，同时内部维护了一个pending队列，消费后的消息都会在其中保存id，只有当ack之后才会从pending中移除。这个队列就可以用来解决，如果客户端挂了，下次重启服务的时候仍然可以处理这条消息。</p>
+<p><strong>消息队列</strong>：也就是stream，和其他数据结构不一样，当list为空时，redis会自动删除这个list，stream可以为空然后保留下来，是因为消息队列里面有消费组和消费者的信息。</p>
+<p><strong>消息</strong>：每个消息都有一个id，也就是时间戳，例如1698731874660-0，前面是时间戳，后面0表示在这个毫秒内的第几个。这样记录id就可以实现范围查找。</p>
+<h2 id="基本命令">基本命令</h2>
+<p><strong>xadd</strong> 追加消息
+<strong>xdel</strong> 删除消息。删除标志位
+<strong>xrange</strong> 获取制定的消息
+<strong>xlen</strong> 消息长度</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">XADD race:italy * rider Castilla
+</span></span><span class="line"><span class="cl">XADD race:france * rider Castilla speed 30.2 position 1 location_id 1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">race:italy stream名称
+</span></span><span class="line"><span class="cl">* id，可以自己设置，一般都用这个，让redis自动生成
+</span></span><span class="line"><span class="cl">rider Castilla 消息内容，为一个一个的k-v
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">xrange race:italy - +
+</span></span><span class="line"><span class="cl">- 代表最小 
+</span></span><span class="line"><span class="cl">+ 代表最大
+</span></span><span class="line"><span class="cl">也可以使用具体的id号，获取单条消息，可以start和end使用同一个id
+</span></span><span class="line"><span class="cl">比如：xrange race:italy 1698732650059-0 1698732650059-0
+</span></span><span class="line"><span class="cl">这些id其实就是时间，我们也可以制定不存在的时间比如1698732650060-0，把后面的59改成60
+</span></span><span class="line"><span class="cl">xrange race:italy 1698732650060-0 +
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/imgs/redis_stream1.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">xlen race:italy
+</span></span><span class="line"><span class="cl">xdel 1698732650059-0 ，这个命令跟上消息id就可以了
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="单消费者">单消费者</h2>
+<p>可以不使用消费组，就使用单个消费者来进行消费，命令是xread
+xread count 10 streams race:italy 0-0 从头开始消费，消费10个
+还可以制定阻塞的方式来消费
+xread block 0 streams race:italy $ 从最新的消息开始消费，block后面接上阻塞时间，0代表一直阻塞，我们在另一个客户端添加上信息，这边就可以消费到了。</p>
+<p><img src="/imgs/redis_stream2.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p><img src="/imgs/redis_stream3.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p><img src="/imgs/redis_stream4.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>如果是单个消费者这样的话，就需要记录当前的消费位置，然后继续消费位置继续向下消费就可以了，也可以消费完了直接删除也行。</p>
+<h2 id="消费组">消费组</h2>
+<p>因为我之前在redis里面创建了消费组，现在直接先把测试数据清空（生产环境不要这样做）。也可以使用xgroup DESTROY去删除。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FLUSHDB
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>插入测试数据</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">XADD race:italy * rider Castilla
+</span></span><span class="line"><span class="cl">XADD race:italy * rider Royce
+</span></span><span class="line"><span class="cl">XADD race:italy * rider Sam-Bodden
+</span></span><span class="line"><span class="cl">XADD race:italy * rider Prickett
+</span></span><span class="line"><span class="cl">XADD race:italy * rider Norem
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>创建消费组</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">XGROUP CREATE race:italy italy_riders 0-0
+</span></span><span class="line"><span class="cl">0-0表示从头开始消费，使用$表示只消费新的数据
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>消费数据</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">XREADGROUP GROUP italy_riders Alice COUNT 1 STREAMS race:italy &gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">italy_riders 组名
+</span></span><span class="line"><span class="cl">Alice  消费者名，需要唯一
+</span></span><span class="line"><span class="cl">race:italy stream名
+</span></span><span class="line"><span class="cl">&gt; 从last-delivered-id开始消费，当前就是0-0，如果消费了一条信息，就是第二条消息的id，在消息都被消费之后就是新的消息
+</span></span><span class="line"><span class="cl">也可以加上block来变成阻塞的方法
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/imgs/redis_stream5.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>再执行一次 XREADGROUP GROUP italy_riders Alice COUNT 1 STREAMS race:italy &gt; ，就是第二条消息
+<img src="/imgs/redis_stream6.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>这时候对于这个消费组来说已经消费了2条消息，此时，消费组中的另一个消费者来消费，也只会消费到第三条消息
+XREADGROUP GROUP italy_riders Bob COUNT 1 STREAMS race:italy &gt;
+<img src="/imgs/redis_stream7.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>我这显示第4条消息，是因为我之前执行了一次上面的命令</p>
+<p>这样同一个消费组就可以做负载均衡了，对于一堆消息，有多个客户端来消费，每个客户端相互独立，消息也只会被一个客户端消费。</p>
+<p><strong>确认数据</strong></p>
+<p>消费完数据之后，需要ack，这样才会在每个消费者的pending中移除该次消息。</p>
+<p>查看当前消费情况 xinfo stream race:italy</p>
+<p><img src="/imgs/redis_stream8.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>length 当前有5条数据
+groups 一个消费组
+last-generated-id 最后一条消息id
+first-entry和last-entry 第一条消息和最后一条消息</p>
+<p>查看消费组情况  xinfo groups race:italy</p>
+<p><img src="/imgs/redis_stream9.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>name  组名
+consumers  消费者个数
+pending 未ack的消息数
+last-delivered-id  最后一条消费消息id</p>
+<p>查看消费者情况 xinfo consumers race:italy italy_riders</p>
+<p><img src="/imgs/redis_stream10.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>name  消费者名
+pending  未ack的消息个数</p>
+<p>使用ack命令确认数据  xack race:italy italy_riders 1698738784018-0</p>
+<p><strong>查看pending队列</strong></p>
+<p>XPENDING race:italy italy_riders - + 10</p>
+<p><img src="/imgs/redis_stream10.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>里面显示了每个未ack的消息的情况，其中第四个字段表示被消费的次数，如果Alice再一次消费，并且未ack的话，这个值就会加1</p>
+<p>在客户端消费者读取 Stream 消息时，Redis 服务器将消息回复给客户端的过程中，客户端突然断开了连接，消息就丢失了。但是 PEL 里已经保存了发出去的消息 ID。待客户端重新连上之后，可以再次收到 PEL 中的消息 ID 列表。不过此时 xreadgroup 的起始消息 ID 不能为参数&gt;，而必须是任意有效的消息 ID，一般将参数设为 0-0，表示读取所有的 PEL 消息以及自last_delivered_id之后的新消息。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/redis/">redis</a>
+        
+            <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">消息队列</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E6%89%8B%E5%86%99spring%E6%95%B4%E5%90%88jpa%E6%B5%81%E7%A8%8B/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">手写Spring整合Jpa流程</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E4%BD%BF%E7%94%A8neo4j%E6%9E%84%E5%BB%BA%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/imgs/neo4j_kg1.png" loading="lazy" data-key="" data-hash="/imgs/neo4j_kg1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Neo4j和知识图谱：使用Neo4j构建知识图谱</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%86%85%E7%BD%AE%E7%AE%97%E6%B3%95%E5%BA%93%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/imgs/DM_20230703230529_001.png" loading="lazy" data-key="" data-hash="/imgs/DM_20230703230529_001.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Neo4j和知识图谱：Neo4j内置算法库的安装和使用</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Neo4j和知识图谱：Neo4j安装和使用</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="ichigo-xin/blog"
+    data-repo-id="R_kgDOJ1CHuA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOJ1CHuM4CXjhh"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2023 ichigo-xin的博客
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.20.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
