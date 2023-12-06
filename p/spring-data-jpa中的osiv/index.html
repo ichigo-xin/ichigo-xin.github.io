@@ -1,24 +1,40 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='To use this feature, add links section to frontmatter.
-This page&amp;rsquo;s frontmatter:
-1 2 3 4 5 6 7 8 9 links: - title: GitHub description: GitHub is the world&amp;#39;s largest software development platform. website: https://github.com image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png - title: TypeScript description: TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. website: https://www.typescriptlang.org image: ts-logo-128.jpg image field accepts both local and external images.'>
-<title>Links</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='说明 本文只对OSIV做总结，以及笔者在实际工作过程中遇到的问题和提出解决办法，还有思考等等。具体的懒加载和OSIV的说明代码示例参见我读过的几篇文章。
+A Guide to Spring&amp;rsquo;s Open Session In View | Baeldung
+Working with Lazy Element Collections in JPA | Baeldung
+总结 在实际工作过程中有个表A关联了将近二十张表，导致有单个接口查询了将近2分钟。
+我的处理办法是因为不好改数据库表结构了，这个接口的内部逻辑就直接写原生的sql来解决。
+对于简单的系统而言，也就是crud，直接开启OSIV，加快开发进程，同时需要注意不要将单个表做过多的关联，有些可以自己通过定义数据库的字段来解决关联关系，没必要通过关联操作来解决。
+对于复杂的系统来说，可以使用mybatisplus等其他技术。
+主要是在项目初期做好评估和技术选型。'>
+<title>Spring Data Jpa中的OSIV</title>
 
-<link rel='canonical' href='https://ichigo-xin.github.io/links/'>
+<link rel='canonical' href='https://ichigo-xin.github.io/p/spring-data-jpa%E4%B8%AD%E7%9A%84osiv/'>
 
-<link rel="stylesheet" href="/scss/style.min.24ef1cc321916467896e8c70c10c0ad7b98c2a8df14298032fb637216e397f50.css"><meta property='og:title' content='Links'>
-<meta property='og:description' content='To use this feature, add links section to frontmatter.
-This page&amp;rsquo;s frontmatter:
-1 2 3 4 5 6 7 8 9 links: - title: GitHub description: GitHub is the world&amp;#39;s largest software development platform. website: https://github.com image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png - title: TypeScript description: TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. website: https://www.typescriptlang.org image: ts-logo-128.jpg image field accepts both local and external images.'>
-<meta property='og:url' content='https://ichigo-xin.github.io/links/'>
+<link rel="stylesheet" href="/scss/style.min.24ef1cc321916467896e8c70c10c0ad7b98c2a8df14298032fb637216e397f50.css"><meta property='og:title' content='Spring Data Jpa中的OSIV'>
+<meta property='og:description' content='说明 本文只对OSIV做总结，以及笔者在实际工作过程中遇到的问题和提出解决办法，还有思考等等。具体的懒加载和OSIV的说明代码示例参见我读过的几篇文章。
+A Guide to Spring&amp;rsquo;s Open Session In View | Baeldung
+Working with Lazy Element Collections in JPA | Baeldung
+总结 在实际工作过程中有个表A关联了将近二十张表，导致有单个接口查询了将近2分钟。
+我的处理办法是因为不好改数据库表结构了，这个接口的内部逻辑就直接写原生的sql来解决。
+对于简单的系统而言，也就是crud，直接开启OSIV，加快开发进程，同时需要注意不要将单个表做过多的关联，有些可以自己通过定义数据库的字段来解决关联关系，没必要通过关联操作来解决。
+对于复杂的系统来说，可以使用mybatisplus等其他技术。
+主要是在项目初期做好评估和技术选型。'>
+<meta property='og:url' content='https://ichigo-xin.github.io/p/spring-data-jpa%E4%B8%AD%E7%9A%84osiv/'>
 <meta property='og:site_name' content='ichigo-xin的博客'>
-<meta property='og:type' content='article'><meta property='article:section' content='Page' />
-<meta name="twitter:title" content="Links">
-<meta name="twitter:description" content="To use this feature, add links section to frontmatter.
-This page&amp;rsquo;s frontmatter:
-1 2 3 4 5 6 7 8 9 links: - title: GitHub description: GitHub is the world&amp;#39;s largest software development platform. website: https://github.com image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png - title: TypeScript description: TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. website: https://www.typescriptlang.org image: ts-logo-128.jpg image field accepts both local and external images.">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Spring Data JPA' /><meta property='article:published_time' content='2023-12-05T17:41:55&#43;08:00'/><meta property='article:modified_time' content='2023-12-05T17:41:55&#43;08:00'/><meta property='og:image' content='https://ichigo-xin.github.io/imgs/OIP.jpg' />
+<meta name="twitter:title" content="Spring Data Jpa中的OSIV">
+<meta name="twitter:description" content="说明 本文只对OSIV做总结，以及笔者在实际工作过程中遇到的问题和提出解决办法，还有思考等等。具体的懒加载和OSIV的说明代码示例参见我读过的几篇文章。
+A Guide to Spring&amp;rsquo;s Open Session In View | Baeldung
+Working with Lazy Element Collections in JPA | Baeldung
+总结 在实际工作过程中有个表A关联了将近二十张表，导致有单个接口查询了将近2分钟。
+我的处理办法是因为不好改数据库表结构了，这个接口的内部逻辑就直接写原生的sql来解决。
+对于简单的系统而言，也就是crud，直接开启OSIV，加快开发进程，同时需要注意不要将单个表做过多的关联，有些可以自己通过定义数据库的字段来解决关联关系，没必要通过关联操作来解决。
+对于复杂的系统来说，可以使用mybatisplus等其他技术。
+主要是在项目初期做好评估和技术选型。"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://ichigo-xin.github.io/imgs/OIP.jpg' />
     <link rel="shortcut icon" href="/ichigo.jpg" />
 
     </head>
@@ -162,7 +178,7 @@ This page&amp;rsquo;s frontmatter:
         </li>
         
         
-        <li  class='current' >
+        <li >
             <a href='/links/' >
                 
                 
@@ -211,15 +227,35 @@ This page&amp;rsquo;s frontmatter:
     
 
             <main class="main full-width">
-    <article class="main-article">
+    <article class="has-image main-article">
     <header class="article-header">
+        <div class="article-image">
+            <a href="/p/spring-data-jpa%E4%B8%AD%E7%9A%84osiv/">
+                
+                    <img src="/imgs/OIP.jpg" loading="lazy" alt="Featured image of post Spring Data Jpa中的OSIV" />
+                
+            </a>
+        </div>
+    
 
     <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/code/" >
+                code
+            </a>
+        
+            <a href="/categories/spring/" >
+                spring
+            </a>
+        
+    </header>
     
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/links/">Links</a>
+            <a href="/p/spring-data-jpa%E4%B8%AD%E7%9A%84osiv/">Spring Data Jpa中的OSIV</a>
         </h2>
     
         
@@ -230,6 +266,19 @@ This page&amp;rsquo;s frontmatter:
     
     
     <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Dec 05, 2023</time>
+            </div>
         
 
         
@@ -258,39 +307,30 @@ This page&amp;rsquo;s frontmatter:
     <section class="article-content">
     
     
-    <p>To use this feature, add <code>links</code> section to frontmatter.</p>
-<p>This page&rsquo;s frontmatter:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">links</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l">GitHub</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l">GitHub is the world&#39;s largest software development platform.</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">website</span><span class="p">:</span><span class="w"> </span><span class="l">https://github.com</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l">TypeScript</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l">TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">website</span><span class="p">:</span><span class="w"> </span><span class="l">https://www.typescriptlang.org</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">ts-logo-128.jpg</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><code>image</code> field accepts both local and external images.</p>
+    <h1 id="说明">说明</h1>
+<p>本文只对OSIV做总结，以及笔者在实际工作过程中遇到的问题和提出解决办法，还有思考等等。具体的懒加载和OSIV的说明代码示例参见我读过的几篇文章。</p>
+<p><a class="link" href="https://www.baeldung.com/spring-open-session-in-view"  target="_blank" rel="noopener"
+    >A Guide to Spring&rsquo;s Open Session In View | Baeldung</a></p>
+<p><a class="link" href="https://www.baeldung.com/java-jpa-lazy-collections"  target="_blank" rel="noopener"
+    >Working with Lazy Element Collections in JPA | Baeldung</a></p>
+<h1 id="总结">总结</h1>
+<p>在实际工作过程中有个表A关联了将近二十张表，导致有单个接口查询了将近2分钟。</p>
+<p>我的处理办法是因为不好改数据库表结构了，这个接口的内部逻辑就直接写原生的sql来解决。</p>
+<p>对于简单的系统而言，也就是crud，直接开启OSIV，加快开发进程，同时需要注意不要将单个表做过多的关联，有些可以自己通过定义数据库的字段来解决关联关系，没必要通过关联操作来解决。</p>
+<p>对于复杂的系统来说，可以使用mybatisplus等其他技术。</p>
+<p>主要是在项目初期做好评估和技术选型。</p>
 
 </section>
 
 
     <footer class="article-footer">
     
+    <section class="article-tags">
+        
+            <a href="/tags/spring-data-jpa/">Spring Data JPA</a>
+        
+    </section>
+
 
     
     <section class="article-copyright">
@@ -311,52 +351,148 @@ This page&amp;rsquo;s frontmatter:
 </article>
 
     
-        <div class="article-list--compact links">
-    
-        <article>
-            <a href="https://github.com" target="_blank" rel="noopener">
-                <div class="article-details">
-                    <h2 class="article-title">GitHub</h2>
-                    <footer class="article-time">
-                        
-                            GitHub is the world&#39;s largest software development platform.
-                        
-                    </footer>
-                </div>
-        
-                
-                    <div class="article-image">
-                        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" loading="lazy">
-                    </div>
-                
-            </a>
-        </article>
-    
-        <article>
-            <a href="https://www.typescriptlang.org" target="_blank" rel="noopener">
-                <div class="article-details">
-                    <h2 class="article-title">TypeScript</h2>
-                    <footer class="article-time">
-                        
-                            TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.
-                        
-                    </footer>
-                </div>
-        
-                
-                    <div class="article-image">
-                        <img src="ts-logo-128.jpg" loading="lazy">
-                    </div>
-                
-            </a>
-        </article>
-    
-</div>
-    
 
     
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E6%89%8B%E5%86%99spring%E6%95%B4%E5%90%88jpa%E6%B5%81%E7%A8%8B/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">手写Spring整合Jpa流程</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/redis%E4%B8%ADstream%E7%9A%84%E4%BD%BF%E7%94%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">redis中stream的使用</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E4%BD%BF%E7%94%A8neo4j%E6%9E%84%E5%BB%BA%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/imgs/neo4j_kg1.png" loading="lazy" data-key="" data-hash="/imgs/neo4j_kg1.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Neo4j和知识图谱：使用Neo4j构建知识图谱</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%86%85%E7%BD%AE%E7%AE%97%E6%B3%95%E5%BA%93%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/">
+        
+        
+            <div class="article-image">
+                
+                    <img src="/imgs/DM_20230703230529_001.png" loading="lazy" data-key="" data-hash="/imgs/DM_20230703230529_001.png"/>
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Neo4j和知识图谱：Neo4j内置算法库的安装和使用</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/neo4j%E5%92%8C%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1neo4j%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Neo4j和知识图谱：Neo4j安装和使用</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
 
      
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="ichigo-xin/blog"
+    data-repo-id="R_kgDOJ1CHuA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOJ1CHuM4CXjhh"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
     
 
     <footer class="site-footer">
