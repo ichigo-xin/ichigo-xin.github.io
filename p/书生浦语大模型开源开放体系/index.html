@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='大模型介绍 首先介绍一下专用模型，专用模型是针对特定任务或特定领域设计和训练的模型。这些模型通常参数较少、结构较简单，但在特定任务上表现非常出色。比如在nlp领域，关键词提取可以使用jieba里面的TextRank算法，摘要提取可以使用Randeng-Pegasus-523M-Summary-Chinese，纠错可以使用ERNIE-CSC。在图像、语音等其他领域也有各种专用模型。
+而大模型是具有大量参数、能够处理广泛任务的通用模型。这些模型在多个领域和任务上都表现出色，通常需要大量计算资源和数据进行训练。比如chatpdf中输入一篇文章，可以让它分析出关键词、摘要等。可以通过一个大模型解决多个问题。
+大模型已经成为人工智能发展的最热门的词，自从ChatGPT问世以来，这一趋势更加明显。ChatGPT作为大规模语言模型的代表，以其卓越的自然语言理解和生成能力，迅速引起了广泛关注，并在多个领域展现了强大的应用潜力。
+书生·浦语2.0介绍 上海人工智能实验室与商汤科技联合香港中文大学和复旦大学正式发布新一代大语言模型书⽣·浦语2.0（InternLM2）。InternLM2 的核心理念在于回归语言建模的本质，致力于通过提高语料质量及信息密度，实现模型基座语言建模能力获得质的提升，进而在数理、代码、对话、创作等各方面都取得长足进步，综合性能达到同量级开源模型的领先水平。
+InternLM2发布了7B和20B两个规格，同时每个规格分别提供InternLM2-Base、InternLM2和InternLM2-Chat三种模型版本。
+InternLM2的主要亮点包括：超长上下文、综合性能提升、优秀的对话和创作体验、工具调用整体能力的提升、突出的数理能力和实用的数据分析功能。其中，超长上下文可以实现在20 万字长输入中几乎完美地实现长文“大海捞针”，配合代码解释器可以进行积分求解。
+书生·浦语开源开放体系 书生·浦语开源开放体系包含数据、预训练、微调、部署、评测、应用这几个方面。
+其中介绍我比较感兴趣的微调和部署这两个方面。
+微调可以采用书生·浦语开放的高效微调框架 XTuner，XTuner支持加载HuggingFace、ModelScope 模型或数据集，支持训练多种模型，最低只需 8GB 显存即可微调 7B模型。微调分为增量续训和有监督微调。增量续训的用场景为让基座模型学习到一些新知识，如某个垂类领域知识，训练数据有文章、书籍、代码等。有监督微调的使用场景为让模型学会理解各种指令进行对话，或者注入少量领域知识，训练数据为高质量的对话、问答数据。
+部署使用LMDeploy，LMDeploy提供大模型在GPU上部署的全流程解决方案，包括模型轻量化、推理和服务。可以实现模型的快速部署。 '>
+<title>书生·浦语大模型开源开放体系</title>
+
+<link rel='canonical' href='https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BC%80%E6%BA%90%E5%BC%80%E6%94%BE%E4%BD%93%E7%B3%BB/'>
+
+<link rel="stylesheet" href="/scss/style.min.24ef1cc321916467896e8c70c10c0ad7b98c2a8df14298032fb637216e397f50.css"><meta property='og:title' content='书生·浦语大模型开源开放体系'>
+<meta property='og:description' content='大模型介绍 首先介绍一下专用模型，专用模型是针对特定任务或特定领域设计和训练的模型。这些模型通常参数较少、结构较简单，但在特定任务上表现非常出色。比如在nlp领域，关键词提取可以使用jieba里面的TextRank算法，摘要提取可以使用Randeng-Pegasus-523M-Summary-Chinese，纠错可以使用ERNIE-CSC。在图像、语音等其他领域也有各种专用模型。
+而大模型是具有大量参数、能够处理广泛任务的通用模型。这些模型在多个领域和任务上都表现出色，通常需要大量计算资源和数据进行训练。比如chatpdf中输入一篇文章，可以让它分析出关键词、摘要等。可以通过一个大模型解决多个问题。
+大模型已经成为人工智能发展的最热门的词，自从ChatGPT问世以来，这一趋势更加明显。ChatGPT作为大规模语言模型的代表，以其卓越的自然语言理解和生成能力，迅速引起了广泛关注，并在多个领域展现了强大的应用潜力。
+书生·浦语2.0介绍 上海人工智能实验室与商汤科技联合香港中文大学和复旦大学正式发布新一代大语言模型书⽣·浦语2.0（InternLM2）。InternLM2 的核心理念在于回归语言建模的本质，致力于通过提高语料质量及信息密度，实现模型基座语言建模能力获得质的提升，进而在数理、代码、对话、创作等各方面都取得长足进步，综合性能达到同量级开源模型的领先水平。
+InternLM2发布了7B和20B两个规格，同时每个规格分别提供InternLM2-Base、InternLM2和InternLM2-Chat三种模型版本。
+InternLM2的主要亮点包括：超长上下文、综合性能提升、优秀的对话和创作体验、工具调用整体能力的提升、突出的数理能力和实用的数据分析功能。其中，超长上下文可以实现在20 万字长输入中几乎完美地实现长文“大海捞针”，配合代码解释器可以进行积分求解。
+书生·浦语开源开放体系 书生·浦语开源开放体系包含数据、预训练、微调、部署、评测、应用这几个方面。
+其中介绍我比较感兴趣的微调和部署这两个方面。
+微调可以采用书生·浦语开放的高效微调框架 XTuner，XTuner支持加载HuggingFace、ModelScope 模型或数据集，支持训练多种模型，最低只需 8GB 显存即可微调 7B模型。微调分为增量续训和有监督微调。增量续训的用场景为让基座模型学习到一些新知识，如某个垂类领域知识，训练数据有文章、书籍、代码等。有监督微调的使用场景为让模型学会理解各种指令进行对话，或者注入少量领域知识，训练数据为高质量的对话、问答数据。
+部署使用LMDeploy，LMDeploy提供大模型在GPU上部署的全流程解决方案，包括模型轻量化、推理和服务。可以实现模型的快速部署。 '>
+<meta property='og:url' content='https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BC%80%E6%BA%90%E5%BC%80%E6%94%BE%E4%BD%93%E7%B3%BB/'>
+<meta property='og:site_name' content='ichigo-xin的博客'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='大模型' /><meta property='article:tag' content='InternLM' /><meta property='article:published_time' content='2024-06-19T18:42:56&#43;08:00'/><meta property='article:modified_time' content='2024-06-19T18:42:56&#43;08:00'/>
+<meta name="twitter:title" content="书生·浦语大模型开源开放体系">
+<meta name="twitter:description" content="大模型介绍 首先介绍一下专用模型，专用模型是针对特定任务或特定领域设计和训练的模型。这些模型通常参数较少、结构较简单，但在特定任务上表现非常出色。比如在nlp领域，关键词提取可以使用jieba里面的TextRank算法，摘要提取可以使用Randeng-Pegasus-523M-Summary-Chinese，纠错可以使用ERNIE-CSC。在图像、语音等其他领域也有各种专用模型。
+而大模型是具有大量参数、能够处理广泛任务的通用模型。这些模型在多个领域和任务上都表现出色，通常需要大量计算资源和数据进行训练。比如chatpdf中输入一篇文章，可以让它分析出关键词、摘要等。可以通过一个大模型解决多个问题。
+大模型已经成为人工智能发展的最热门的词，自从ChatGPT问世以来，这一趋势更加明显。ChatGPT作为大规模语言模型的代表，以其卓越的自然语言理解和生成能力，迅速引起了广泛关注，并在多个领域展现了强大的应用潜力。
+书生·浦语2.0介绍 上海人工智能实验室与商汤科技联合香港中文大学和复旦大学正式发布新一代大语言模型书⽣·浦语2.0（InternLM2）。InternLM2 的核心理念在于回归语言建模的本质，致力于通过提高语料质量及信息密度，实现模型基座语言建模能力获得质的提升，进而在数理、代码、对话、创作等各方面都取得长足进步，综合性能达到同量级开源模型的领先水平。
+InternLM2发布了7B和20B两个规格，同时每个规格分别提供InternLM2-Base、InternLM2和InternLM2-Chat三种模型版本。
+InternLM2的主要亮点包括：超长上下文、综合性能提升、优秀的对话和创作体验、工具调用整体能力的提升、突出的数理能力和实用的数据分析功能。其中，超长上下文可以实现在20 万字长输入中几乎完美地实现长文“大海捞针”，配合代码解释器可以进行积分求解。
+书生·浦语开源开放体系 书生·浦语开源开放体系包含数据、预训练、微调、部署、评测、应用这几个方面。
+其中介绍我比较感兴趣的微调和部署这两个方面。
+微调可以采用书生·浦语开放的高效微调框架 XTuner，XTuner支持加载HuggingFace、ModelScope 模型或数据集，支持训练多种模型，最低只需 8GB 显存即可微调 7B模型。微调分为增量续训和有监督微调。增量续训的用场景为让基座模型学习到一些新知识，如某个垂类领域知识，训练数据有文章、书籍、代码等。有监督微调的使用场景为让模型学会理解各种指令进行对话，或者注入少量领域知识，训练数据为高质量的对话、问答数据。
+部署使用LMDeploy，LMDeploy提供大模型在GPU上部署的全流程解决方案，包括模型轻量化、推理和服务。可以实现模型的快速部署。 ">
+    <link rel="shortcut icon" href="/ichigo.jpg" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/ichigo_huc5828797f4458237968d886b43fe8dd1_45236_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">ichigo-xin的博客</a></h1>
+            <h2 class="site-description">爱我所爱</h2>
+        </div>
+    </header><ol class="social-menu">
+            
+                <li>
+                    <a 
+                        href='https://github.com/ichigo-xin'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>暗色模式</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/internlm/" >
+                InternLM
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BC%80%E6%BA%90%E5%BC%80%E6%94%BE%E4%BD%93%E7%B3%BB/">书生·浦语大模型开源开放体系</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jun 19, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="大模型介绍">大模型介绍</h1>
+<p>        首先介绍一下专用模型，专用模型是针对特定任务或特定领域设计和训练的模型。这些模型通常参数较少、结构较简单，但在特定任务上表现非常出色。比如在nlp领域，关键词提取可以使用jieba里面的TextRank算法，摘要提取可以使用Randeng-Pegasus-523M-Summary-Chinese，纠错可以使用ERNIE-CSC。在图像、语音等其他领域也有各种专用模型。</p>
+<p>        而大模型是具有大量参数、能够处理广泛任务的通用模型。这些模型在多个领域和任务上都表现出色，通常需要大量计算资源和数据进行训练。比如chatpdf中输入一篇文章，可以让它分析出关键词、摘要等。可以通过一个大模型解决多个问题。</p>
+<p>        大模型已经成为人工智能发展的最热门的词，自从ChatGPT问世以来，这一趋势更加明显。ChatGPT作为大规模语言模型的代表，以其卓越的自然语言理解和生成能力，迅速引起了广泛关注，并在多个领域展现了强大的应用潜力。</p>
+<p><img src="/imgs/IntrnLM1-1-%e9%80%9a%e7%94%a8%e6%a8%a1%e5%9e%8b.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="专用模型和大模型"
+	
+	
+></p>
+<h1 id="书生浦语20介绍">书生·浦语2.0介绍</h1>
+<p>        上海人工智能实验室与商汤科技联合香港中文大学和复旦大学正式发布新一代大语言模型书⽣·浦语2.0（InternLM2）。InternLM2 的核心理念在于回归语言建模的本质，致力于通过提高语料质量及信息密度，实现模型基座语言建模能力获得质的提升，进而在数理、代码、对话、创作等各方面都取得长足进步，综合性能达到同量级开源模型的领先水平。</p>
+<p>        InternLM2发布了7B和20B两个规格，同时每个规格分别提供InternLM2-Base、InternLM2和InternLM2-Chat三种模型版本。</p>
+<p>        InternLM2的主要亮点包括：超长上下文、综合性能提升、优秀的对话和创作体验、工具调用整体能力的提升、突出的数理能力和实用的数据分析功能。其中，超长上下文可以实现在20 万字长输入中几乎完美地实现长文“大海捞针”，配合代码解释器可以进行积分求解。</p>
+<p><img src="/imgs/IntrnLM1-1-%e4%ba%ae%e7%82%b9%e4%bb%8b%e7%bb%8d.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="专用模型和大模型"
+	
+	
+></p>
+<h1 id="书生浦语开源开放体系">书生·浦语开源开放体系</h1>
+<p>        书生·浦语开源开放体系包含数据、预训练、微调、部署、评测、应用这几个方面。</p>
+<p><img src="/imgs/IntrnLM1-1-%e5%bc%80%e6%ba%90%e4%bd%93%e7%b3%bb.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="专用模型和大模型"
+	
+	
+></p>
+<p>        其中介绍我比较感兴趣的微调和部署这两个方面。</p>
+<p>        微调可以采用书生·浦语开放的高效微调框架 XTuner，XTuner支持加载HuggingFace、ModelScope 模型或数据集，支持训练多种模型，最低只需 8GB 显存即可微调 7B模型。微调分为增量续训和有监督微调。增量续训的用场景为让基座模型学习到一些新知识，如某个垂类领域知识，训练数据有文章、书籍、代码等。有监督微调的使用场景为让模型学会理解各种指令进行对话，或者注入少量领域知识，训练数据为高质量的对话、问答数据。</p>
+<p>        部署使用LMDeploy，LMDeploy提供大模型在GPU上部署的全流程解决方案，包括模型轻量化、推理和服务。可以实现模型的快速部署。
+        </p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/">大模型</a>
+        
+            <a href="/tags/internlm/">InternLM</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <script
+    src="https://giscus.app/client.js"
+    data-repo="ichigo-xin/blog"
+    data-repo-id="R_kgDOJ1CHuA"
+    data-category="Announcements"
+    data-category-id="DIC_kwDOJ1CHuM4CXjhh"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="en"
+    crossorigin="anonymous"
+    async
+></script>
+<script>
+    function setGiscusTheme(theme) {
+        let giscus = document.querySelector("iframe.giscus-frame");
+        if (giscus) {
+            giscus.contentWindow.postMessage(
+                {
+                    giscus: {
+                        setConfig: {
+                            theme: theme,
+                        },
+                    },
+                },
+                "https://giscus.app"
+            );
+        }
+    }
+
+    (function () {
+        addEventListener("message", (e) => {
+            if (event.origin !== "https://giscus.app") return;
+            handler();
+        });
+        window.addEventListener("onColorSchemeChange", handler);
+
+        function handler() {
+            if (document.documentElement.dataset.scheme === "light") {
+                setGiscusTheme('light');
+            } else {
+                setGiscusTheme('dark_dimmed');
+            }
+        }
+    })();
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2024 ichigo-xin的博客
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.20.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

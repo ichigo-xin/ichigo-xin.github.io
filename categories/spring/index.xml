@@ -6,7 +6,27 @@
         <description>Recent content in spring on ichigo-xin的博客</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <lastBuildDate>Wed, 26 Jul 2023 21:56:50 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/categories/spring/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 05 Dec 2023 17:41:55 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/categories/spring/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Spring Data Jpa中的OSIV</title>
+        <link>https://ichigo-xin.github.io/p/spring-data-jpa%E4%B8%AD%E7%9A%84osiv/</link>
+        <pubDate>Tue, 05 Dec 2023 17:41:55 +0800</pubDate>
+        
+        <guid>https://ichigo-xin.github.io/p/spring-data-jpa%E4%B8%AD%E7%9A%84osiv/</guid>
+        <description>&lt;img src="https://ichigo-xin.github.io/imgs/OIP.jpg" alt="Featured image of post Spring Data Jpa中的OSIV" /&gt;&lt;h1 id=&#34;说明&#34;&gt;说明&lt;/h1&gt;
+&lt;p&gt;本文只对OSIV做总结，以及笔者在实际工作过程中遇到的问题和提出解决办法，还有思考等等。具体的懒加载和OSIV的说明代码示例参见我读过的几篇文章。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.baeldung.com/spring-open-session-in-view&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;A Guide to Spring&amp;rsquo;s Open Session In View | Baeldung&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.baeldung.com/java-jpa-lazy-collections&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Working with Lazy Element Collections in JPA | Baeldung&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&#34;总结&#34;&gt;总结&lt;/h1&gt;
+&lt;p&gt;在实际工作过程中有个表A关联了将近二十张表，导致有单个接口查询了将近2分钟。&lt;/p&gt;
+&lt;p&gt;我的处理办法是因为不好改数据库表结构了，这个接口的内部逻辑就直接写原生的sql来解决。&lt;/p&gt;
+&lt;p&gt;对于简单的系统而言，也就是crud，直接开启OSIV，加快开发进程，同时需要注意不要将单个表做过多的关联，有些可以自己通过定义数据库的字段来解决关联关系，没必要通过关联操作来解决。&lt;/p&gt;
+&lt;p&gt;对于复杂的系统来说，可以使用mybatisplus等其他技术。&lt;/p&gt;
+&lt;p&gt;主要是在项目初期做好评估和技术选型。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>手写Spring整合Jpa流程</title>
         <link>https://ichigo-xin.github.io/p/%E6%89%8B%E5%86%99spring%E6%95%B4%E5%90%88jpa%E6%B5%81%E7%A8%8B/</link>
         <pubDate>Wed, 26 Jul 2023 21:56:50 +0800</pubDate>

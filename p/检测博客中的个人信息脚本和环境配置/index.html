@@ -8,7 +8,7 @@
 
 <link rel='canonical' href='https://ichigo-xin.github.io/p/%E6%A3%80%E6%B5%8B%E5%8D%9A%E5%AE%A2%E4%B8%AD%E7%9A%84%E4%B8%AA%E4%BA%BA%E4%BF%A1%E6%81%AF%E8%84%9A%E6%9C%AC%E5%92%8C%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/'>
 
-<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='检测博客中的个人信息脚本和环境配置'>
+<link rel="stylesheet" href="/scss/style.min.24ef1cc321916467896e8c70c10c0ad7b98c2a8df14298032fb637216e397f50.css"><meta property='og:title' content='检测博客中的个人信息脚本和环境配置'>
 <meta property='og:description' content='这篇文章介绍一个小小的检测脚本，用来检测写的博客有没有个人信息，以及如何在电脑上快速配置命令方便使用。
 需要电脑上安装了python3，并且配置了环境变量
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 # 文件名 check_personnal_info.py import sys def detect_personal_info(file_path): target_strings = [&amp;#39;root&amp;#39;, &amp;#39;729&amp;#39;] # 替换为你要检测的个人信息字符串列表 with open(file_path, &amp;#39;r&amp;#39;, encoding=&amp;#39;utf-8&amp;#39;) as file: lines = file.readlines() for i, line in enumerate(lines): for target_string in target_strings: if target_string.lower() in line.lower(): print(f&amp;#34;个人信息字符串 &amp;#39;{target_string}&amp;#39; 出现在第 {i&#43;1} 行：\n{line}&amp;#34;) if __name__ == &amp;#39;__main__&amp;#39;: if len(sys.argv) &amp;lt; 2: print(&amp;#34;请提供文件名作为参数&amp;#34;) else: file_path = sys.'>
@@ -451,7 +451,7 @@
         
             2020 - 
         
-        2023 ichigo-xin的博客
+        2024 ichigo-xin的博客
     </section>
     
     <section class="powerby">
