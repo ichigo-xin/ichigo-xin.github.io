@@ -6,7 +6,37 @@
         <description>Recent content in InternLM on ichigo-xin的博客</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <lastBuildDate>Wed, 19 Jun 2024 18:42:56 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/tags/internlm/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 20 Jun 2024 00:22:20 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/tags/internlm/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>书生·浦语大模型实战营第二期作业二</title>
+        <link>https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%AE%9E%E6%88%98%E8%90%A5%E7%AC%AC%E4%BA%8C%E6%9C%9F%E4%BD%9C%E4%B8%9A%E4%BA%8C/</link>
+        <pubDate>Thu, 20 Jun 2024 00:22:20 +0800</pubDate>
+        
+        <guid>https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%AE%9E%E6%88%98%E8%90%A5%E7%AC%AC%E4%BA%8C%E6%9C%9F%E4%BD%9C%E4%B8%9A%E4%BA%8C/</guid>
+        <description>&lt;p&gt;使用 &lt;code&gt;InternLM2-Chat-1.8B&lt;/code&gt; 模型生成 300 字的小故事：
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/IntrnLM1-2-300%e5%ad%97%e5%b0%8f%e6%95%85%e4%ba%8b.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;300 字的小故事&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;使用书生·浦语 Web 和浦语对话，和书生·浦语对话，并找到书生·浦语 1 处表现不佳的案例：
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/IntrnLM1-2-%e4%b8%8d%e4%bd%b3%e7%9a%84%e6%a1%88%e4%be%8b.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;不佳的案例&#34;
+	
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>书生·浦语大模型开源开放体系</title>
         <link>https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%BC%80%E6%BA%90%E5%BC%80%E6%94%BE%E4%BD%93%E7%B3%BB/</link>
         <pubDate>Wed, 19 Jun 2024 18:42:56 +0800</pubDate>
