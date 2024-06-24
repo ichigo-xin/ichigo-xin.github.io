@@ -6,7 +6,142 @@
         <description>Recent content in Posts on ichigo-xin的博客</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <lastBuildDate>Thu, 20 Jun 2024 00:22:20 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Mon, 24 Jun 2024 10:22:20 +0800</lastBuildDate><atom:link href="https://ichigo-xin.github.io/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>书生·浦语大模型实战营第二期作业三</title>
+        <link>https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%AE%9E%E6%88%98%E8%90%A5%E7%AC%AC%E4%BA%8C%E6%9C%9F%E4%BD%9C%E4%B8%9A%E4%B8%89/</link>
+        <pubDate>Mon, 24 Jun 2024 10:22:20 +0800</pubDate>
+        
+        <guid>https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%AE%9E%E6%88%98%E8%90%A5%E7%AC%AC%E4%BA%8C%E6%9C%9F%E4%BD%9C%E4%B8%9A%E4%B8%89/</guid>
+        <description>&lt;h1 id=&#34;rag介绍&#34;&gt;RAG介绍&lt;/h1&gt;
+&lt;p&gt;RAG（Retrieval Augmented Generation），字面意思就是 检索 - 增强 - 生成。通过检索向量库找到相关文本，再通过特定的prompt使用大模型的能力进行解答。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-1rag%e4%bb%8b%e7%bb%8d.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;RAG原理&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;具体步骤如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;先将文档知识加载。其中就可能就有ocr图片识别，同时对于长的文档还需要进行切分。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;入向量库。一般是通过embedding模型将切分的文本片段进行向量化，加载到向量库中。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;处理用户问题。用户输入问题时，将用户问题也通过embedding模型进行向量化，之后在通过余弦距离等找出相似的TopN个文本片段。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;组装prompt，用llm大模型进行回答。将上一步搜索出来的文本片段和用户问题组装好，输入给大模型，让大模型进行回答。
+例如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;文本信息内容如下. \n&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;---------------------\n&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;{context_str}&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;\n---------------------\n&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;请使用上面的内容信息进行回答，而不是根据模型已有的知识，如果上面的内容信息没有答案，就回复不知道, &amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;回答这个问题: {query_str}\n&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;rag可以解决以下问题：
+1.大模型回答幻觉，模型对于不知道的知识可能会一本正经的胡说八道.
+2.过时知识，因为模型训练的成本较高，不可能一直更新模型，对于近期的知识，模型是不知道的。使用rag技术可以先通过搜索将近期知识作为问题的一部分输入给模型，使用模型的能力对问题进行回答。
+3.可以追溯回答来源。这一点在一些场景非常重要，对于问题回答的可溯源，增加可信的程度。&lt;/p&gt;
+&lt;p&gt;RAG vs 微调&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-2ragvs%e5%be%ae%e8%b0%83.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;RAG vs 微调&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;对于特定任务，即使通过prompt调整也不一定可以获得很好的效果，比如摘要总结这一个具体类型的任务，使用微调是更好的。
+而对于结合知识进行回答的场景，RAG则有着它的优势。&lt;/p&gt;
+&lt;h1 id=&#34;茴香豆&#34;&gt;茴香豆&lt;/h1&gt;
+&lt;p&gt;茴香豆是一款可以嵌入到IM工具流中的RAG应用
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-4%e8%8c%b4%e9%a6%99%e8%b1%86%e5%b7%a5%e4%bd%9c%e6%b5%81.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;茴香豆工作流&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;工作流中有rejection pipeline，可以针对无意义的闲聊进行过滤。&lt;/p&gt;
+&lt;h1 id=&#34;线上茴香豆助手对话截图&#34;&gt;线上茴香豆助手对话截图&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-4test1.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;茴香豆助手对话截图&#34;
+	
+	
+&gt;
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-4test2.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;茴香豆助手对话截图&#34;
+	
+	
+&gt;
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-4test3.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;茴香豆助手对话截图&#34;
+	
+	
+&gt;
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-4test4.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;茴香豆助手对话截图&#34;
+	
+	
+&gt;
+&lt;img src=&#34;https://ichigo-xin.github.io/imgs/InternLM-3-4test5.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;茴香豆助手对话截图&#34;
+	
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>书生·浦语大模型实战营第二期作业二</title>
         <link>https://ichigo-xin.github.io/p/%E4%B9%A6%E7%94%9F%E6%B5%A6%E8%AF%AD%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%AE%9E%E6%88%98%E8%90%A5%E7%AC%AC%E4%BA%8C%E6%9C%9F%E4%BD%9C%E4%B8%9A%E4%BA%8C/</link>
         <pubDate>Thu, 20 Jun 2024 00:22:20 +0800</pubDate>
